@@ -1,0 +1,39 @@
+
+name: Build Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Preparar Windows
+        uses: actions/checkout@v4
+
+      - name: Verificar sistema
+        shell: pwsh
+        run: |
+          Write-Host "Build Windows iniciado"
+          Write-Host "Sistema operacional:"
+          Get-ComputerInfo |
+            Select-Object WindowsProductName,
+              WindowsVersion
+
+      - name: Finalizar build
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory `
+            -Path build -Force
+          "Build concluido" |
+            Out-File build/status.txt
+
+      - name: Salvar resultado
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: build/
